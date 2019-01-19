@@ -1,0 +1,69 @@
+#!/usr/bin/python
+# -*- coding: UTF-8 -*-
+
+import util
+import socket
+import global_data
+import three_way_handshake
+import data_transfer
+import sys
+
+url = ""
+
+if len(sys.argv) == 2:
+    url = sys.argv[1]
+else:
+    print "Illegal Argument Error"
+    raise IOError
+
+
+def start(url):
+    global_data.init()
+    global_data.set_value("interface", "em1")
+    try:
+        main_socket = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.IPPROTO_RAW)
+        main_socket.bind((global_data.get_value("interface"), 0))
+    except socket.error, msg:
+        print 'Socket could not be created. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
+        sys.exit(0)
+    global_data.set_value("main_socket", main_socket)
+    global_data.set_value("url", url)
+
+    local_ip = util.get_local_ip()
+    global_data.set_value("local_ip", local_ip)
+
+    local_port = util.get_local_port()
+    global_data.set_value("local_port", local_port)
+
+    local_ip_binary = util.get_local_ip_binary()
+    global_data.set_value("local_ip_binary", local_ip_binary)
+
+    local_mac_binary = util.get_local_mac_binary()
+    global_data.set_value("local_mac_binary", local_mac_binary)
+
+    gateway_ip_binary = util.get_gateway_ip_binary()
+    global_data.set_value("gateway_ip_binary", gateway_ip_binary)
+
+    gateway_mac_binary = util.get_gateway_mac_binary()
+    global_data.set_value("gateway_mac_binary", gateway_mac_binary)
+
+    server_ip = util.get_server_ip_and_downloaded_file_name(url)
+    global_data.set_value("server_ip", server_ip)
+
+    http_request_length = len("GET " + url + " HTTP/1.0\r\n\r\n")
+    global_data.set_value("http_request_length", http_request_length)
+
+    global_data.set_value("number_of_retransmit_packet_to_be_ACK", 0)
+    global_data.set_value("current_cwnd_size", 1)
+    global_data.set_value("old_data_length", 0)
+    global_data.set_value("old_sequence_number", 0)
+
+    three_way_handshake.handshake_step_one()
+    data_transfer.receive_data_from_server()
+    three_way_handshake.handshake_step_three()
+    data_transfer.send_data_to_server()
+    data_transfer.receive_data_from_server()
+
+
+if __name__ == '__main__':
+    start(url)
