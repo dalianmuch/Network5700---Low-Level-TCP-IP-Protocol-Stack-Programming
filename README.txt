@@ -17,11 +17,4 @@ Challenges in this project:
 
 2. The second problem is in three way handshake, we sent the data out but we couldn’t receive the data correctly, This is because that we used global variable incorrectly, but it is very hard to debug because through wireshark we couldn’t get which part we made the mistake. Therefore, though it is a small mistake, we still spent some time to debug.
 
-
-Contribution for each member:
-
-Xiangshi primarily did the getting mac, getting ip and receiving data from server and testing parts who also found and fixed many bugs in arp header and three way handshake when the project can not run correctly.
-
-Zhengda primarily wrote the ethernet, http, tcp and ip headers files and finished send data to the server parts in the project and also helped to debug.
-
  
